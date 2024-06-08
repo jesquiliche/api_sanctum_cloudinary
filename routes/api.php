@@ -34,6 +34,5 @@ Route::post('/tipo', [TipoController::class, 'store']);
 Route::put('/tipo/{id}', [TipoController::class, 'update']);
 Route::delete('/tipo/{id}', [TipoController::class, 'destroy']);
 
-//Route::apiResource('producto', ProductoController::class);
-Route::put('/producto/{id}', [ProductoController::class, 'update']);
-Route::get('/producto/', [ProductoController::class, 'index']);
+Route::apiResource('producto', ProductoController::class);
+

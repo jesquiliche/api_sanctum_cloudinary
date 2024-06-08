@@ -34,7 +34,7 @@ class ProductoController extends Controller
             'ano' => 'nullable|integer',
             'sabor' => 'nullable|string|max:255',
             'tipo_id' => 'required|exists:tipos,id',
-            'imagen'=>'nullable|string',
+            'imagen' => 'nullable|string',
             'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'denominacion_id' => 'required|exists:denominaciones,id',
         ]);
@@ -68,8 +68,13 @@ class ProductoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Producto $producto): JsonResponse
+    public function show($id): JsonResponse
     {
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return response()->json(["mensaje" => "Producto no encontrado"], 404);
+        }
         return response()->json($producto);
     }
 
@@ -79,7 +84,7 @@ class ProductoController extends Controller
     public function update(Request $request, $id)
     {
         // Obtener el producto por su ID
-        
+
         // Validar los datos recibidos en la solicitud
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
@@ -94,14 +99,18 @@ class ProductoController extends Controller
             'file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'denominacion_id' => 'required|exists:denominaciones,id',
         ]);
-    
+
         // Si la validación falla, retornar los errores en formato JSON
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-      
-        $producto = Producto::findOrFail($id);
-    
+
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return response()->json(["mensaje" => "Producto no encontrado"], 404);
+        }
+
         // Procesar y guardar la nueva imagen si se ha cargado
         if ($request->hasFile('file')) {
             // Eliminar la imagen antigua si existe
@@ -109,27 +118,31 @@ class ProductoController extends Controller
                 // Nota: No se puede eliminar directamente de Cloudinary con el SDK sin conocer el public_id
                 // Por lo que en este ejemplo no se eliminan imágenes antiguas.
             }
-    
+
             // Guardar la nueva imagen en Cloudinary
             $uploadedFileUrl = Cloudinary::upload($request->file('file')->getRealPath())->getSecurePath();
             $producto->imagen = $uploadedFileUrl;
         }
-    
+
         // Actualizar el producto con los datos validados
         $producto->update($request->all());
-    
+
         // Retornar el producto actualizado en formato JSON
         return response()->json($producto);
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Producto $producto): JsonResponse
+    public function destroy($id): JsonResponse
     {
         // Nota: No se puede eliminar directamente de Cloudinary con el SDK sin conocer el public_id
         // Por lo que en este ejemplo no se eliminan imágenes de Cloudinary.
+        $producto = Producto::find($id);
 
+        if (!$producto) {
+            return response()->json(["mensaje" => "Producto no encontrado"], 404);
+        }
         $producto->delete();
 
         return response()->json(null, 204); // 204 No Content

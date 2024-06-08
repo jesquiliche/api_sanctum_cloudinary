@@ -74,7 +74,10 @@ class DenominacionController extends Controller
      */
     public function destroy($id)
     {
-        $denominacion = Denominacion::findOrFail($id);
+        $denominacion = Denominacion::find($id);
+        if (!$denominacion) {
+                  return response()->json(['message' => 'Denominación no encontrada'], 404);
+        }
         $denominacion->delete();
 
         return response()->json(null, 204);
