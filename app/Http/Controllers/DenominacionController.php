@@ -76,7 +76,7 @@ class DenominacionController extends Controller
     {
         $denominacion = Denominacion::find($id);
         if (!$denominacion) {
-                  return response()->json(['message' => 'Denominación no encontrada'], 404);
+            return response()->json(['message' => 'Denominación no encontrada'], 404);
         }
         $denominacion->delete();
 
